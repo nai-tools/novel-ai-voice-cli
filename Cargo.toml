@@ -6,5 +6,5 @@ edition = "2021"
 [dependencies]
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
-novelai_api = {path = "../novelai_api/"}
 tokio = { version = "1", features = ["full"] }
+novelai_api = "0.2"

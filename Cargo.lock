@@ -566,7 +566,9 @@ dependencies = [
 
 [[package]]
 name = "novelai_api"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b3544f8e53d24ce47d595afd5dcca95cba18d8b0da03144ddf0246645110014"
 dependencies = [
  "bytes",
  "lazy_static",
