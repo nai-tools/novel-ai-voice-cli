@@ -62,7 +62,7 @@ async fn main() -> anyhow::Result<()> {
             // Move permit into scope to limit amount of parralel tasks
             let _permit = permit;
 
-            println!("{}/{}", i, prompt_len);
+            println!("Downloading: {}/{}", i+1, prompt_len);
 
             let mut conf = Configuration::new();
             conf.bearer_access_token = Some(access_token);
