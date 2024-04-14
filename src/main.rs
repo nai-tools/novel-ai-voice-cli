@@ -1,7 +1,10 @@
 use std::fs;
+use std::io::Write;
 use std::path::PathBuf;
+use std::process::{Command, Stdio};
 use std::sync::Arc;
 
+use anyhow::Context;
 use clap::Parser;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
@@ -28,6 +31,10 @@ struct Args {
     /// Number of "Threads" to use for downloading
     #[arg(short, long, default_value_t = 10)]
     parallel_threads: usize,
+
+    /// Use ffmpeg to combine the audio files
+    #[arg(short, long, default_value_t = false)]
+    combine: bool,
 }
 
 #[tokio::main]
@@ -67,7 +74,8 @@ async fn main() -> anyhow::Result<()> {
                     continue;
                 }
 
-                let file = File::create(format!("./output/{:05}.webm", i)).await;
+                let file_name = format!("./output/{:05}.webm", i);
+                let file = File::create(file_name).await;
                 if file.is_err() {
                     eprintln!("{:?}", file);
                     continue;
@@ -86,5 +94,59 @@ async fn main() -> anyhow::Result<()> {
     for task in tasks {
         task.await.unwrap();
     }
+
+    if args.combine {
+        check_for_ffmpeg().context("NovelAIVoiceCLI: Failed to execute ffmpeg. Have you installed it? In order to use --combine you must have ffmpeg installed!")?;
+        concat_with_ffmpeg()?;
+    }
+    Ok(())
+}
+
+fn prepare_concat_for_ffmpeg() -> anyhow::Result<()> {
+    // Open the directory
+    let dir = fs::read_dir("./output/")?;
+
+    let mut filenames = vec![];
+
+    // Iterate over the entries in the directory
+    for entry in dir {
+        let entry = entry?;
+        let path = entry.path();
+
+        // Get the file name as a string
+        if let Some(file_name) = path.file_name() {
+            if let Some(file_name_str) = file_name.to_str() {
+                // Write the file name to the output file
+                filenames.push(file_name_str.to_owned());
+            }
+        }
+    }
+
+    filenames.sort();
+
+    // Open or create the output file
+    let mut file = fs::File::create("./output/inputs.txt")?;
+    for filename in filenames {
+        writeln!(file, "file '{}'", filename)?;
+    }
+
+    Ok(())
+}
+
+fn check_for_ffmpeg() -> anyhow::Result<()> {
+    prepare_concat_for_ffmpeg()?;
+    let _ = Command::new("ffmpeg")
+        .args(["-version"])
+        .stdout(Stdio::inherit())
+        .output()?;
+    Ok(())
+}
+
+fn concat_with_ffmpeg() -> anyhow::Result<()> {
+    let _ = Command::new("ffmpeg")
+        .current_dir("./output/")
+        .args(["-f", "concat", "-i", "inputs.txt", "../output.mp3"])
+        .stdout(Stdio::inherit())
+        .output()?;
     Ok(())
 }
