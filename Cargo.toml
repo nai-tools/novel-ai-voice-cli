@@ -1,6 +1,6 @@
 [package]
 name = "novel-ai-voice-cli"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 description = "A CLI application using the novelai-api package to export TTS audio files"
 authors = ["Allstreamer"]
@@ -16,8 +16,7 @@ eula = false
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
-openssl = { version = "0.10.64", features = ["vendored"] }
-novelai_api = "0.2"
+novelai_api = "0.2.2"
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
