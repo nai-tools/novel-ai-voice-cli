@@ -2,9 +2,36 @@
 name = "novel-ai-voice-cli"
 version = "0.1.0"
 edition = "2021"
+description = "A CLI application using the novelai-api package to export TTS audio files"
+authors = ["Allstreamer"]
+repository = "https://github.com/nai-tools/novel-ai-voice-cli"
+
+[package.metadata.wix]
+upgrade-guid = "047564B1-CB14-4071-A4C0-E92CF9733D4F"
+path-guid = "3803FE29-DBFC-4657-A2EF-29A9AB20AA29"
+license = false
+eula = false
 
 [dependencies]
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 novelai_api = "0.2"
+
+# The profile that 'cargo dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+# Config for 'cargo dist'
+[workspace.metadata.dist]
+# The preferred cargo-dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.13.1"
+# CI backends to support
+ci = ["github"]
+# The installers to generate for each app
+installers = []
+# Target platforms to build apps for (Rust target-triple syntax)
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
+# Publish jobs to run in CI
+pr-run-mode = "plan"
