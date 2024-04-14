@@ -16,6 +16,7 @@ eula = false
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
+openssl = { version = "0.10.64", features = ["vendored"] }
 novelai_api = "0.2"
 
 # The profile that 'cargo dist' will build with
